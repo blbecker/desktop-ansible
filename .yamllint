@@ -1,6 +1,10 @@
 ---
 extends: default
 
+ignore: |
+  **/vault.yml
+  **/vault.yaml
+
 rules:
   comments:
     require-starting-space: false

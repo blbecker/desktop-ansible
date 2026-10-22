@@ -1,5 +1,10 @@
 #SPDX-License-Identifier: MIT-0
 ---
+- name: Load encrypted notification secrets
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/vars/vault.yml"
+  no_log: true
+
 - name: Create Ansible service account
   become: true
   ansible.builtin.user:
@@ -29,11 +34,64 @@
     update_cache: true
     cache_valid_time: 86400
 
+- name: Install ntfy CLI via APT (amd64)
+  become: true
+  block:
+    - name: Ensure APT keyring directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Download ntfy APT signing key
+      ansible.builtin.get_url:
+        url: https://archive.ntfy.sh/apt/keyring.gpg
+        dest: /etc/apt/keyrings/ntfy.gpg
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Configure ntfy APT repository (amd64 only)
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch=amd64 signed-by=/etc/apt/keyrings/ntfy.gpg]
+          https://archive.ntfy.sh/apt stable main
+        filename: ntfy
+        state: present
+        update_cache: false
+
+    - name: Install ntfy CLI
+      ansible.builtin.apt:
+        name: ntfy
+        state: present
+        update_cache: true
+
+- name: Configure ntfy client
+  become: true
+  ansible.builtin.template:
+    src: client.yml.j2
+    dest: /etc/ntfy/client.yml
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: Install ansible-pull systemd service
   become: true
   ansible.builtin.template:
     src: ansible-pull.service.j2
     dest: /etc/systemd/system/ansible-pull.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Install systemd failure notification service
+  become: true
+  ansible.builtin.template:
+    src: systemd-failure-notify@.service.j2
+    dest: /etc/systemd/system/systemd-failure-notify@.service
     owner: root
     group: root
     mode: "0644"
@@ -58,3 +116,13 @@
     name: ansible-pull.timer
     enabled: true
     state: started
+
+- name: Deploy systemd failure notification script
+  ansible.builtin.template:
+    src: systemd-failure-notify.j2
+    dest: /usr/local/libexec/systemd-failure-notify
+    owner: root
+    group: root
+    mode: "0700"
+  become: true
+  no_log: true

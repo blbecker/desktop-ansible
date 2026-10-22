@@ -2,6 +2,7 @@
 Description=Pull and apply workstation Ansible configuration
 Wants=network-online.target
 After=network-online.target
+OnFailure=systemd-failure-notify@%n.service
 
 [Service]
 Type=oneshot
