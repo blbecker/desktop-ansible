@@ -35,3 +35,9 @@ repos:
     hooks:
       - id: actionlint
         files: ^\.github/workflows/
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.20.0
+    hooks:
+      - id: markdownlint-cli2
+        args: [--fix]
