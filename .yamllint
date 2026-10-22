@@ -23,4 +23,4 @@ rules:
     present: true
 
   truthy:
-    allowed-values: ["true", "false"]
+    allowed-values: ["true", "false", "on"]
