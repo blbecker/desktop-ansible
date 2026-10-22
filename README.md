@@ -9,5 +9,5 @@ ansible-pull \
   --limit "$(hostname -f)" \
   --tags bootstrap \
   --checkout main \
-  ansible/playbooks/local.yml
+  ansible/local.yml
 ```
