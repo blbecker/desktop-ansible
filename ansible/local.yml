@@ -1,0 +1,9 @@
+---
+- name: Configure workstation
+  hosts: all
+
+  roles:
+    - role: tartarus.bootstrap
+      tags:
+        - bootstrap
+

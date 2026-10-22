@@ -1,0 +1,12 @@
+[Unit]
+Description=Run workstation Ansible configuration periodically
+
+[Timer]
+OnBootSec=5min
+OnCalendar=hourly
+RandomizedDelaySec=5min
+Persistent=true
+Unit=ansible-pull.service
+
+[Install]
+WantedBy=timers.target
