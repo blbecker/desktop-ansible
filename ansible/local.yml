@@ -6,3 +6,6 @@
     - role: bootstrap
       tags:
         - bootstrap
+    - role: common
+      tags:
+        - common
