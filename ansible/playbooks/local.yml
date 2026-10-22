@@ -1,0 +1,9 @@
+---
+- name: Configure workstation
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Display workstation type
+      ansible.builtin.debug:
+        msg: "Configuring {{ workstation_type }}: {{ inventory_hostname }}"
