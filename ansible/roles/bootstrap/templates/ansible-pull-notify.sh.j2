@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+UNIT="${1:?Usage: ansible-pull-notify.sh <failed-systemd-unit>}"
+
+NTFY_URL="https://ntfy.tartarus.us/alerts"
+NTFY_TOKEN="{{ vault_ntfy_token }}"
+
+HOST="$(hostname -f 2>/dev/null || hostname)"
+TIMESTAMP="$(date --iso-8601=seconds)"
+RESULT="$(systemctl show "$UNIT" --property=Result --value 2>/dev/null || true)"
+RESULT="${RESULT:-unknown}"
+
+LOGS="$(journalctl \
+  --unit="$UNIT" \
+  --lines=40 \
+  --no-pager \
+  --output=short-iso 2>&1 || true)"
+
+BODY="Host: ${HOST}
+Unit: ${UNIT}
+Result: ${RESULT}
+Time: ${TIMESTAMP}"
+
+LOG_FILE="$(mktemp --suffix=.txt)"
+trap 'rm -f "$LOG_FILE"' EXIT
+
+printf '%s\n' "$LOGS" >"$LOG_FILE"
+
+curl \
+  --fail \
+  --silent \
+  --show-error \
+  --max-time 30 \
+  --upload-file "$LOG_FILE" \
+  --header "Authorization: Bearer ${NTFY_TOKEN}" \
+  --header "X-Title: Ansible pull failed: ${HOST}" \
+  --header "X-Priority: 4" \
+  --header "X-Tags: warning,gear" \
+  --header "X-Filename: ansible-pull-logs.txt" \
+  --header "X-Message: Host: ${HOST} | Unit: ${UNIT} | Result: ${RESULT} | Time: ${TIMESTAMP}" \
+  "$NTFY_URL"
+
+# curl \
+#     --fail \
+#     --silent \
+#     --show-error \
+#     --max-time 30 \
+#     --request POST \
+#     --header "Authorization: Bearer ${NTFY_TOKEN}" \
+#     --header "Title: Ansible pull failed: ${HOST}" \
+#     --header "Priority: 4" \
+#     --header "Tags: warning,gear" \
+#     --form-string "message=${BODY}" \
+#     --form "file=@${LOG_FILE};type=text/plain;filename=ansible-pull-logs.txt" \
+#     "$NTFY_URL"

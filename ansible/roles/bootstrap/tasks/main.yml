@@ -1,5 +1,10 @@
 #SPDX-License-Identifier: MIT-0
 ---
+- name: Load encrypted notification secrets
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/vars/vault.yml"
+  no_log: true
+
 - name: Create Ansible service account
   become: true
   ansible.builtin.user:
@@ -58,3 +63,13 @@
     name: ansible-pull.timer
     enabled: true
     state: started
+
+- name: Deploy Ansible pull notification script
+  ansible.builtin.template:
+    src: ansible-pull-notify.sh.j2
+    dest: /usr/local/libexec/ansible-pull-notify
+    owner: root
+    group: root
+    mode: "0700"
+  become: true
+  no_log: true
