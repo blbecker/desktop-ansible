@@ -1,0 +1,20 @@
+[Unit]
+Description=Pull and apply workstation Ansible configuration
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=ansible
+Group=ansible
+Environment=HOME=/var/lib/ansible
+WorkingDirectory=/var/lib/ansible
+UMask=0077
+
+ExecStart=/usr/bin/ansible-pull \
+    -U https://github.com/blbecker/desktop-ansible.git \
+    -d /var/lib/ansible/checkout \
+    -i ansible/inventory/hosts.yml \
+    --limit {{ inventory_hostname }} \
+    --checkout main \
+    ansible/local.yml
