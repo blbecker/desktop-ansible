@@ -3,7 +3,6 @@
   hosts: all
 
   roles:
-    - role: tartarus.bootstrap
+    - role: bootstrap
       tags:
         - bootstrap
-

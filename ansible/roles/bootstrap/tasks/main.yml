@@ -8,7 +8,7 @@
     create_home: true
     home: /var/lib/ansible
     shell: /usr/sbin/nologin
-    password: '!'
+    password: "!"
 
 - name: Configure passwordless sudo for Ansible
   become: true
