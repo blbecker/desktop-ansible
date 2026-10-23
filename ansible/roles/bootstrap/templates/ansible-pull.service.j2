@@ -19,5 +19,5 @@ ExecStart=/usr/bin/ansible-pull \
     -i ansible/inventory/hosts.yml \
     --vault-password-file=${CREDENTIALS_DIRECTORY}/ansible-vault-password \
     --limit {{ inventory_hostname }} \
-    --checkout feature/ansible-vault \
+    --checkout main \
     ansible/local.yml
