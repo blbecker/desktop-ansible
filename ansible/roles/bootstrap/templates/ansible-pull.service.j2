@@ -2,6 +2,7 @@
 Description=Pull and apply workstation Ansible configuration
 Wants=network-online.target
 After=network-online.target
+OnFailure=systemd-failure-notify@%n.service
 
 [Service]
 Type=oneshot
@@ -10,11 +11,13 @@ Group=ansible
 Environment=HOME=/var/lib/ansible
 WorkingDirectory=/var/lib/ansible
 UMask=0077
+LoadCredentialEncrypted=ansible-vault-password:/etc/credstore.encrypted/ansible-vault-password
 
 ExecStart=/usr/bin/ansible-pull \
     -U https://github.com/blbecker/desktop-ansible.git \
     -d /var/lib/ansible/checkout \
     -i ansible/inventory/hosts.yml \
+    --vault-password-file=${CREDENTIALS_DIRECTORY}/ansible-vault-password \
     --limit {{ inventory_hostname }} \
     --checkout main \
     ansible/local.yml

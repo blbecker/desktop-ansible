@@ -1,0 +1,8 @@
+[Unit]
+Description=Notify failure of %I
+OnFailure=%I.service
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/libexec/systemd-failure-notify %I

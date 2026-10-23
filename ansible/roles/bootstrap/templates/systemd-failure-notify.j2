@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+UNIT="${1:?Usage: systemd-failure-notify <failed-systemd-unit>}"
+
+NTFY_TOKEN="{{ bootstrap_ntfy_token }}"
+NTFY_URL="https://ntfy.tartarus.us/alerts"
+
+HOST="$(hostname -f 2>/dev/null || hostname)"
+TIMESTAMP="$(date --iso-8601=seconds)"
+
+RESULT="$(systemctl show "$UNIT" --property=Result --value 2>/dev/null || true)"
+RESULT="${RESULT:-unknown}"
+
+LOG_FILE="$(mktemp --suffix=.txt)"
+trap 'rm -f "$LOG_FILE"' EXIT
+
+journalctl \
+    --unit="$UNIT" \
+    --lines=40 \
+    --no-pager \
+    --output=short-iso >"$LOG_FILE" 2>&1 || true
+
+# Clean unit name for filename (remove .service suffix, replace dots with dashes)
+FILENAME_UNIT="${UNIT%.service}"
+FILENAME_UNIT="${FILENAME_UNIT//./-}"
+FILENAME="${FILENAME_UNIT}-logs.txt"
+
+MESSAGE="$(cat <<EOF
+# Systemd Unit Failed: ${UNIT}
+
+- **Host:** ${HOST}
+- **Unit:** \`${UNIT}\`
+- **Result:** ${RESULT}
+- **Time:** ${TIMESTAMP}
+
+See the attached logs for details.
+EOF
+)"
+
+ntfy publish \
+    --token "$NTFY_TOKEN" \
+    --title "Systemd unit ${UNIT} failed on ${HOST}" \
+    --priority 4 \
+    --tags warning,gear \
+    --markdown \
+    --file "$LOG_FILE" \
+    --filename "$FILENAME" \
+    "$NTFY_URL" \
+    "$MESSAGE"

@@ -1,3 +1,3 @@
 #SPDX-License-Identifier: MIT-0
 ---
-# vars file for tartarus.bootstrap
+bootstrap_ntfy_token: "{{ vault_ntfy_token }}"
