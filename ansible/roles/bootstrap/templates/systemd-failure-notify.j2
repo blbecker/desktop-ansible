@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 UNIT="${1:?Usage: systemd-failure-notify <failed-systemd-unit>}"
 
-NTFY_TOKEN="{{ vault_ntfy_token }}"
+NTFY_TOKEN="{{ bootstrap_ntfy_token }}"
 NTFY_URL="https://ntfy.tartarus.us/alerts"
 
 HOST="$(hostname -f 2>/dev/null || hostname)"
