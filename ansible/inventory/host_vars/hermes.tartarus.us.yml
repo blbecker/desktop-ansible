@@ -1,2 +1,4 @@
 ---
 workstation_type: laptop
+backrest_user: benjamin
+backrest_schedule: "30 6 * * *"

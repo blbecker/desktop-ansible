@@ -1,0 +1,16 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Reload systemd
+  become: true
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Restart backrest
+  become: true
+  ansible.builtin.systemd_service:
+    name: backrest.service
+    state: restarted
+
+- name: Warn about missing checksum
+  ansible.builtin.debug:
+    msg: "WARNING: backrest_tarball_sha256 is not set. Skipping checksum validation for backrest download."

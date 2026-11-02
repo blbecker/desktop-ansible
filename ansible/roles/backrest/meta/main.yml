@@ -1,0 +1,14 @@
+#SPDX-License-Identifier: MIT-0
+---
+galaxy_info:
+  author: benjamin
+  description: Backrest role for desktop-ansible
+  license: MIT-0
+  min_ansible_version: "2.10"
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+  galaxy_tags: []
+dependencies: []
