@@ -1,0 +1,45 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for backrest
+backrest_version: "1.14.1"
+# sha256 of backrest_Linux_x86_64.tar.gz for the pinned version (from backrest_1.14.1_checksums.txt);
+# empty = skip validation, warn. Update together with backrest_version.
+backrest_tarball_sha256: "acc7835a9c55b3d254f0fa285cacbe87ac912cb7e069d0211924838020e6921c"
+
+backrest_user: "{{ ansible_user_id }}"
+backrest_instance_id: "{{ inventory_hostname.split('.') | first }}" # hermes/deimos — must be unique per machine
+backrest_data_dir: "/home/{{ backrest_user }}/.local/share/backrest"
+backrest_config_path: "/home/{{ backrest_user }}/.config/backrest/config.json"
+backrest_ui_port: 9898
+backrest_ui_bind: "127.0.0.1" # localhost only
+
+backrest_backup_paths:
+  - "/home/{{ backrest_user }}"
+
+# Standard excludes for a workstation home dir
+backrest_excludes:
+  - ".cache"
+  - ".var"
+  - "snap"
+  - ".local/share/Trash"
+  - ".local/share/Steam"
+  - ".steam"
+  - ".local/share/containers"
+  - ".docker"
+  - "go/pkg/mod"
+  - ".cargo/registry"
+  - ".rustup"
+  - ".npm"
+  - ".gradle"
+  - "VirtualBox VMs"
+  - "Downloads/*.iso"
+  - "Downloads/*.zip"
+  - "Videos"
+
+backrest_exclude_if_present:
+  - "node_modules"
+  - ".venv"
+  - "venv"
+  - "__pycache__"
+
+backrest_schedule: "0 */12 * * *" # default: every 12 hours

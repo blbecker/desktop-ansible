@@ -1,0 +1,14 @@
+[Unit]
+Description=Backrest Service
+After=network.target
+
+[Service]
+Type=simple
+User={{ backrest_user }}
+Group={{ backrest_user }}
+ExecStart=/usr/local/bin/backrest
+Restart=on-failure
+Environment="BACKREST_PORT={{ backrest_ui_bind }}:{{ backrest_ui_port }}"
+
+[Install]
+WantedBy=multi-user.target

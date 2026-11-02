@@ -1,0 +1,92 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Ensure backrest dependencies are installed
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+      - tar
+    state: present
+
+- name: Download backrest binary tarball
+  ansible.builtin.get_url:
+    url: "https://github.com/garethgeorge/backrest/releases/download/v{{ backrest_version }}/backrest_Linux_x86_64.tar.gz"
+    dest: "/tmp/backrest-{{ backrest_version }}_Linux_x86_64.tar.gz"
+    checksum: "sha256:{{ backrest_tarball_sha256 }}"
+    mode: "0644"
+  when: backrest_tarball_sha256 != ""
+  register: backrest_download_result
+
+- name: Download backrest binary tarball (without checksum)
+  ansible.builtin.get_url:
+    url: "https://github.com/garethgeorge/backrest/releases/download/v{{ backrest_version }}/backrest_Linux_x86_64.tar.gz"
+    dest: "/tmp/backrest-{{ backrest_version }}_Linux_x86_64.tar.gz"
+    mode: "0644"
+  when: backrest_tarball_sha256 == ""
+  register: backrest_download_result_no_checksum
+  notify:
+    - Warn about missing checksum
+
+- name: Extract backrest binary
+  ansible.builtin.unarchive:
+    src: "/tmp/backrest-{{ backrest_version }}_Linux_x86_64.tar.gz"
+    dest: "/tmp/backrest-{{ backrest_version }}"
+    remote_src: true
+    creates: "/tmp/backrest-{{ backrest_version }}/backrest"
+
+- name: Install backrest binary
+  become: true
+  ansible.builtin.copy:
+    src: "/tmp/backrest-{{ backrest_version }}/backrest"
+    dest: /usr/local/bin/backrest
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Create backrest config directory
+  ansible.builtin.file:
+    path: "/home/{{ backrest_user }}/.config/backrest"
+    state: directory
+    owner: "{{ backrest_user }}"
+    group: "{{ backrest_user }}"
+    mode: "0700"
+
+- name: Create backrest data directory
+  ansible.builtin.file:
+    path: "{{ backrest_data_dir }}"
+    state: directory
+    owner: "{{ backrest_user }}"
+    group: "{{ backrest_user }}"
+    mode: "0700"
+
+- name: Template backrest config.json
+  ansible.builtin.template:
+    src: config.json.j2
+    dest: "{{ backrest_config_path }}"
+    owner: "{{ backrest_user }}"
+    group: "{{ backrest_user }}"
+    mode: "0600"
+  notify:
+    - Restart backrest
+
+- name: Template backrest systemd service
+  become: true
+  ansible.builtin.template:
+    src: backrest.service.j2
+    dest: /etc/systemd/system/backrest.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart backrest
+
+- name: Apply pending systemd changes
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start backrest service
+  become: true
+  ansible.builtin.systemd_service:
+    name: backrest.service
+    enabled: true
+    state: started
