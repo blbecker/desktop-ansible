@@ -26,7 +26,7 @@ This role installs Backrest as a client for multihost sync with a central Backre
 ## Role Variables
 
 | Variable | Default | Description |
-|----------|---------|-------------|
+| --- | --- | --- |
 | `backrest_version` | `"1.14.1"` | GitHub release tag to install |
 | `backrest_tarball_sha256` | pinned v1.14.1 x86_64 sha256 | Checksum for `backrest_Linux_x86_64.tar.gz`; set to `""` to skip validation (warns). Update alongside `backrest_version` |
 | `backrest_user` | `"{{ ansible_user_id }}"` | User to run backrest as (overridden in host_vars) |
