@@ -7,11 +7,11 @@ backrest_version: "1.14.1"
 backrest_tarball_sha256: "acc7835a9c55b3d254f0fa285cacbe87ac912cb7e069d0211924838020e6921c"
 
 backrest_user: "{{ ansible_user_id }}"
-backrest_instance_id: "{{ inventory_hostname.split('.') | first }}"  # hermes/deimos — must be unique per machine
+backrest_instance_id: "{{ inventory_hostname.split('.') | first }}" # hermes/deimos — must be unique per machine
 backrest_data_dir: "/home/{{ backrest_user }}/.local/share/backrest"
 backrest_config_path: "/home/{{ backrest_user }}/.config/backrest/config.json"
 backrest_ui_port: 9898
-backrest_ui_bind: "127.0.0.1"  # localhost only
+backrest_ui_bind: "127.0.0.1" # localhost only
 
 backrest_backup_paths:
   - "/home/{{ backrest_user }}"
@@ -42,4 +42,4 @@ backrest_exclude_if_present:
   - "venv"
   - "__pycache__"
 
-backrest_schedule: "0 */12 * * *"  # default: every 12 hours
+backrest_schedule: "0 */12 * * *" # default: every 12 hours

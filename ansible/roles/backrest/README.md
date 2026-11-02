@@ -5,6 +5,7 @@ Installs and configures Backrest (garethgeorge/backrest) for workstation backups
 ## Purpose
 
 This role installs Backrest as a client for multihost sync with a central Backrest instance in a k8s cluster. Workstations are *clients* that:
+
 - Run backup-only plans (prune/check/compact live on the cluster instance)
 - Receive repo config (B2 location, repo password) via shared repos from the central server
 - Store backup config locally (protected by FDE)
@@ -66,12 +67,14 @@ This role installs Backrest as a client for multihost sync with a central Backre
 ## Inventory Wiring
 
 Add to `host_vars/hermes.tartarus.us.yml`:
+
 ```yaml
 backrest_user: benjamin
 backrest_schedule: "30 6 * * *"  # daily at 6:30am
 ```
 
 Add to `host_vars/deimos.tartarus.us.yml`:
+
 ```yaml
 backrest_user: benjamin
 backrest_schedule: "0 */12 * * *"  # every 12 hours
