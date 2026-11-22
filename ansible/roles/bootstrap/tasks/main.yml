@@ -131,3 +131,16 @@
     mode: "0700"
   become: true
   no_log: true
+
+- name: Enable SSH
+  become: true
+  community.general.ufw:
+    rule: limit
+    port: ssh
+    proto: tcp
+
+- name: Deny everything and enable UFW
+  become: true
+  community.general.ufw:
+    state: enabled
+    policy: deny
