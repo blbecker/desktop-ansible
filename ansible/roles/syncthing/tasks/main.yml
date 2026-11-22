@@ -8,3 +8,17 @@
     state: present
     update_cache: true
     cache_valid_time: 86400
+
+- name: Allow all access to syncthing port (8384)
+  community.general.ufw:
+    rule: allow
+    port: '8384'
+    proto: tcp
+
+- name: Start and enable syncthing
+  become: true
+  become_user: benjamin
+  ansible.builtin.systemd_service:
+    name: syncthing
+    state: started
+    scope: user
