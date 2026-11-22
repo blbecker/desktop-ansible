@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Install syncthing
+  become: true
+  ansible.builtin.apt:
+    name:
+      - syncthing 
+    state: present
+    update_cache: true
+    cache_valid_time: 86400
